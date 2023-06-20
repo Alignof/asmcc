@@ -18,6 +18,9 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.s
 install: $(OBJECTS)
 	$(CC) -O2 -o $(TARGET) $^ $(LDFLAGS)
 
+run: $(TARGET)
+	$(TARGET) 10
+
 test:
 	./test.sh
 
