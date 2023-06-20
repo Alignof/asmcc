@@ -2,9 +2,9 @@ CFLAGS	:= -std=c11 -g -O0 -static -Wall
 LDFLAGS := -static
 
 TARGET  := ./asmcc
-SRCDIR  := ./asm
-OBJDIR  := ./asm/obj
-SOURCES := $(wildcard ./asm/*.s)
+SRCDIR  := ./src
+OBJDIR  := ./src/obj
+SOURCES := $(wildcard ./src/*.s)
 OBJECTS := $(addprefix $(OBJDIR)/, $(notdir $(SOURCES:.s=.o)))
 
 $(TARGET): $(OBJECTS)
