@@ -66,15 +66,17 @@ main:
     add rsi, 8  # argv + 1
     # seek null charactor and count length
     mov rdx, rsi
-.BEGIN_COUNT:
-    mov al, [rdx]
-    cmp al, 0
-    je .END_COUNT
-    add rdx, 1
-    jmp .BEGIN_COUNT
-.END_COUNT:    
+    # while (*seek != 0) { seek++;
+    .BEGIN_COUNT:
+        mov al, BYTE PTR [rdx]
+        cmp al, 0
+        je .END_COUNT
+        add rdx, 1
+        jmp .BEGIN_COUNT
+    .END_COUNT:    
+    #}
 
-    sub rdx, rsi    # len
+    sub rdx, rsi    # len = seek - &argv[1]
     mov rdi, 1  # stdout
     mov rax, 1  # write syscall
     syscall
