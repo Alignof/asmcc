@@ -1,11 +1,17 @@
 .intel_syntax noprefix
 .data
-.STRING_INVALID_ARGUMENT: .string "invalid arguments\n"
-.STRING_EPILOGUE: .string ".intel_syntax noprefix\n.globl main\n"
-.STRING_LABEL_MAIN: .string "main:\n"
-.STRING_MOV_ARGV1_TO_RAX: .string "\tmov rax, "
-.STRING_LINEBREAK: .string "\n"
-.STRING_RET: .string "\tret\n"
+    .STRING_INVALID_ARGUMENT: .string "invalid arguments\n"
+        LEN_INVALID_ARGUMENT = (. - .STRING_INVALID_ARGUMENT)
+    .STRING_EPILOGUE: .string ".intel_syntax noprefix\n.globl main\n"
+        LEN_EPILOGUE = (. - .STRING_EPILOGUE - 1)
+    .STRING_LABEL_MAIN: .string "main:\n"
+        LEN_LABEL_MAIN = (. - .STRING_LABEL_MAIN - 1)
+    .STRING_MOV_ARGV1_TO_RAX: .string "\tmov rax, "
+        LEN_MOV_ARGV1_TO_RAX = (. - .STRING_MOV_ARGV1_TO_RAX - 1)
+    .STRING_LINEBREAK: .string "\n"
+        LEN_LINEBREAK = (. - .STRING_LINEBREAK - 1)
+    .STRING_RET: .string "\tret\n"
+        LEN_RET = (. - .STRING_RET - 1)
 .text
 .globl main
 
@@ -24,7 +30,7 @@ main:
         je .ARGC_IS_2
 
         # write(2, "invalid arguments\n", 18);
-        mov rdx, 18 # len("invalid arguments\n")
+        mov rdx, LEN_INVALID_ARGUMENT # len("invalid arguments\n")
         lea rsi, .STRING_INVALID_ARGUMENT[rip] # string 
         mov rdi, 2  # stderr
         mov rax, 1  # write syscall
@@ -40,21 +46,21 @@ main:
     #}
 
     # write(1, ".intel_syntax noprefix\n.globl main\n", 35);
-    mov rdx, 35 # len(".intel_syntax noprefix\n.globl main\n")
+    mov rdx, LEN_EPILOGUE # len(".intel_syntax noprefix\n.globl main\n")
     lea rsi, .STRING_EPILOGUE[rip] # string 
     mov rdi, 1  # stdout
     mov rax, 1  # write syscall
     syscall
 
     # write(1, "main:\n", 6);
-    mov rdx, 6  # len("main:\n")
+    mov rdx, LEN_LABEL_MAIN  # len("main:\n")
     lea rsi, .STRING_LABEL_MAIN[rip] # string 
     mov rdi, 1  # stdout
     mov rax, 1  # write syscall
     syscall
 
     # write(1, "\tmov rax, ", 11);
-    mov rdx, 10 # len("\tmov rax, ")
+    mov rdx, LEN_MOV_ARGV1_TO_RAX # len("\tmov rax, ")
     lea rsi, .STRING_MOV_ARGV1_TO_RAX[rip] # string 
     mov rdi, 1  # stdout
     mov rax, 1  # write syscall
@@ -82,14 +88,14 @@ main:
     syscall
 
     # write(1, "\n", 1);
-    mov rdx, 1 # len("\n")
+    mov rdx, LEN_LINEBREAK # len("\n")
     lea rsi, .STRING_LINEBREAK[rip] # string 
     mov rdi, 1  # stdout
     mov rax, 1  # write syscall
     syscall
 
     # write(1, "\tret\n", 5);
-    mov rdx, 5 # len("\tret\n")
+    mov rdx, LEN_RET # len("\tret\n")
     lea rsi, .STRING_RET[rip] # string 
     mov rdi, 1  # stdout
     mov rax, 1  # write syscall
