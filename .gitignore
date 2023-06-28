@@ -54,3 +54,4 @@ dkms.conf
 # my config
 asmcc
 peda-session-asmcc.txt
+tmp.s
