@@ -54,7 +54,7 @@ main:
     syscall
 
     # write(1, "\tmov rax, ", 11);
-    mov rdx, 11 # len("\tmov rax, ")
+    mov rdx, 10 # len("\tmov rax, ")
     lea rsi, .STRING_MOV_ARGV1_TO_RAX[rip] # string 
     mov rdi, 1  # stdout
     mov rax, 1  # write syscall
