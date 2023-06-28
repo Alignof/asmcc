@@ -21,7 +21,7 @@ install: $(OBJECTS)
 run: $(TARGET)
 	$(TARGET) 10
 
-test:
+test: $(TARGET)
 	./test.sh
 
 clean:
