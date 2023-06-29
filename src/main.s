@@ -2,8 +2,8 @@
 .data
     .STRING_INVALID_ARGUMENT: .string "invalid arguments\n"
         LEN_INVALID_ARGUMENT = (. - .STRING_INVALID_ARGUMENT)
-    .STRING_EPILOGUE: .string ".intel_syntax noprefix\n.globl main\n"
-        LEN_EPILOGUE = (. - .STRING_EPILOGUE - 1)
+    .STRING_PROLOGUE: .string ".intel_syntax noprefix\n.globl main\n"
+        LEN_PROLOGUE = (. - .STRING_PROLOGUE - 1)
     .STRING_LABEL_MAIN: .string "main:\n"
         LEN_LABEL_MAIN = (. - .STRING_LABEL_MAIN - 1)
     .STRING_MOV_ARGV1_TO_RAX: .string "\tmov rax, "
@@ -46,8 +46,8 @@ main:
     #}
 
     # write(1, ".intel_syntax noprefix\n.globl main\n", 35);
-    mov rdx, LEN_EPILOGUE # len(".intel_syntax noprefix\n.globl main\n")
-    lea rsi, .STRING_EPILOGUE[rip] # string 
+    mov rdx, LEN_PROLOGUE # len(".intel_syntax noprefix\n.globl main\n")
+    lea rsi, .STRING_PROLOGUE[rip] # string 
     mov rdi, 1  # stdout
     mov rax, 1  # write syscall
     syscall
