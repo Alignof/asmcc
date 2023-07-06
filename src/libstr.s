@@ -37,17 +37,17 @@ strtol:
     # seek null charactor and convert str to long
     mov rdx, rdi # seek(rdx) = rdi(1st arg)
     # while (*seek != 0) { seek++; rax *= 10; rax += str[seek]
-    .BEGIN_COUNT:
+    .BEGIN_CONVERT:
         mov bl, BYTE PTR [rdx]
         cmp bl, 0
-        je .END_COUNT
+        je .END_CONVERT
         imul eax, 10
         movzx ebx, bl
         sub ebx, 0x30 # 0x30 = '0'
         add eax, ebx
         add rdx, 1
-        jmp .BEGIN_COUNT
-    .END_COUNT:    
+        jmp .BEGIN_CONVERT
+    .END_CONVERT:    
     #}
 
     # epilogue
