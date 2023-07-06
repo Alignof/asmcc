@@ -1,6 +1,7 @@
 .intel_syntax noprefix
 .data
 .text
+.globl printf
 
 # rax -> number of args
 # rdi(1st) -> format string

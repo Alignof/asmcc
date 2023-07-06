@@ -6,10 +6,8 @@
         LEN_PROLOGUE = (. - .STRING_PROLOGUE - 1)
     .STRING_LABEL_MAIN: .string "main:\n"
         LEN_LABEL_MAIN = (. - .STRING_LABEL_MAIN - 1)
-    .STRING_MOV_ARGV1_TO_RAX: .string "\tmov rax, "
+    .STRING_MOV_ARGV1_TO_RAX: .string "\tmov rax, %ld\n"
         LEN_MOV_ARGV1_TO_RAX = (. - .STRING_MOV_ARGV1_TO_RAX - 1)
-    .STRING_LINEBREAK: .string "\n"
-        LEN_LINEBREAK = (. - .STRING_LINEBREAK - 1)
     .STRING_RET: .string "\tret\n"
         LEN_RET = (. - .STRING_RET - 1)
 .text
@@ -51,6 +49,7 @@ main:
     mov rdi, 1  # 1st: stdout
     mov rax, 1  # syscall num: write syscall
     syscall
+    #=====end func=====
 
     # write(1, "main:\n", 6);
     mov rdx, LEN_LABEL_MAIN  # 3rd: len("main:\n")
@@ -58,41 +57,36 @@ main:
     mov rdi, 1  # 1st: stdout
     mov rax, 1  # syscall num: write syscall
     syscall
+    #=====end func=====
 
-    # write(1, "\tmov rax, ", 11);
-    mov rdx, LEN_MOV_ARGV1_TO_RAX # 3rd: len("\tmov rax, ")
-    lea rsi, .STRING_MOV_ARGV1_TO_RAX[rip] # 2nd: string 
-    mov rdi, 1  # 1st: stdout
-    mov rax, 1  # syscall num: write syscall
-    syscall
+    # printf("  mov rax, %ld\n", strtol(argv[1], &argv[1], 10));
+    mov edx, 10 # 3rd: base = 10
+    mov rsi, [rbp - 0x10] # 2nd: &argv[1]
+    add rsi, 8
+    mov rdi, [rsi] # 1st: argv[1]
+    mov rax, 3
+    push rbp
+    mov rbp, rsp
+    and rsp, -16
 
-    # write(1, argv[1], 2);
-    mov rsi, [rbp - 0x10] # char **argv 
-    mov rsi, [rsi] # char *argv
-    add rsi, 8  # argv + 1
-    # seek null charactor and count length
-    mov rdx, rsi
-    # while (*seek != 0) { seek++;
-    .BEGIN_COUNT:
-        mov al, BYTE PTR [rdx]
-        cmp al, 0
-        je .END_COUNT
-        add rdx, 1
-        jmp .BEGIN_COUNT
-    .END_COUNT:    
-    #}
+    call strtol
 
-    sub rdx, rsi    # 3rd: len = seek - &argv[1]
-    mov rdi, 1  # 1st: stdout
-    mov rax, 1  # syscall num: write syscall
-    syscall
+    mov rsp, rbp
+    pop rbp
 
-    # write(1, "\n", 1);
-    mov rdx, LEN_LINEBREAK # 3rd: len("\n")
-    lea rsi, .STRING_LINEBREAK[rip] # 2nd: string 
-    mov rdi, 1  # 1st: stdout
-    mov rax, 1  # syscall num: write syscall
-    syscall
+    mov rsi, rax # 2nd: strtol(argv[1], &argv[1], 10)
+    lea rdi, .STRING_MOV_ARGV1_TO_RAX[rip] # 1st: str
+    mov rax, 2
+
+    push rbp
+    mov rbp, rsp
+    and rsp, -16
+
+    call printf
+
+    mov rsp, rbp
+    pop rbp
+    #=====end func=====
 
     # write(1, "\tret\n", 5);
     mov rdx, LEN_RET # 3rd: len("\tret\n")
@@ -100,6 +94,7 @@ main:
     mov rdi, 1  # 1st: stdout
     mov rax, 1  # syscall num: write syscall
     syscall
+    #=====end func=====
 
     # return 0;
     mov rax, 0
