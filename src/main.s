@@ -76,7 +76,6 @@ main:
 
     mov rsi, rax # 2nd: strtol(argv[1], &argv[1], 10)
     lea rdi, .STRING_MOV_ARGV1_TO_RAX[rip] # 1st: str
-    mov rax, 2
 
     push rbp
     mov rbp, rsp

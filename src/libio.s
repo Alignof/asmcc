@@ -16,13 +16,13 @@ printf:
     # seek null charactor and count length
     mov rdx, rdi # seek(rdx) = rdi(1st arg)
     # while (*seek != 0) { seek++;
-    .BEGIN_COUNT:
+    .BEGIN_SEEK_NULL:
         mov al, BYTE PTR [rdx]
         cmp al, 0
-        je .END_COUNT
+        je .END_SEEK_NULL
         add rdx, 1
-        jmp .BEGIN_COUNT
-    .END_COUNT:    
+        jmp .BEGIN_SEEK_NULL
+    .END_SEEK_NULL:    
     #}
     sub rdx, rdi # 3rd: len = seek - &argv[1]
     mov rsi, rdi # 2nd: format string ptr
@@ -34,5 +34,4 @@ printf:
     mov rsp, rbp
     pop rbp
     ret
-
 

@@ -20,7 +20,7 @@ strtol:
         # write(2, "invalid arguments\n", 18);
         mov rdx, LEN_STRTOL_ERRMSG # 3rd: len(STRING_STRTOL_ERRMSG)
         lea rsi, .STRING_STRTOL_ERRMSG[rip] # 2nd: string 
-        mov edi, 2  # stderr
+        mov edi, 2  # 1st: stderr
         mov eax, 1  # syscall num: write syscall
         syscall
 
