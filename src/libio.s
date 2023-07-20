@@ -21,42 +21,56 @@ printf:
         mov al, BYTE PTR [rdx]
         cmp al, 0
         je .END_SEEK_NULL
-        ## if (seek != '%') {
-        #    cmp al, 0x25 # '%' == 0x25
-        #    je .SEEK_IS_PERCENT
+        # if (seek != '%') {
+            cmp al, 0x25 # '%' == 0x25
+            je .SEEK_IS_PERCENT
 
-        #    # write(1, seek, head - seek);
-        #    # evaculate
-        #    push rdx # seek
-        #    lea rsi, rdx # 2nd: string 
-        #    sub rdx, rcx # 3rd: seek - head
-        #    mov rdi, 1  # stdout
-        #    mov rax, 1  # syscall num: write syscall
-        #    syscall
-        #    # restore
-        #    pop rdx
-        #    #=====end func=====
+            # write(1, seek, head - seek);
+            # evaculate
+            push rdx # seek
+            mov rsi, rdx # 2nd: string 
+            sub rdx, rcx # 3rd: seek - head
+            mov rdi, 1  # stdout
+            mov rax, 1  # syscall num: write syscall
+            syscall
+            # restore
+            pop rdx
+            #=====end func=====
 
-        #    # seek++
-        #    add rdx, 1
+            # seek++
+            add rdx, 1
 
-        #    # switch (*seek) {
-        #        mov al, BYTE PTR [rdx]
-        #        cmp al, 'd'
-        #        je .SEEK_IS_d
-        #    .SEEK_IS_d
-        #        # write(2, num, len(num));
-        #        lea rsi, rdx # 2nd: string 
-        #        sub rdx, rcx # 3rd: len(num)
-        #        mov rdi, 1  # stdout
-        #        mov rax, 1  # syscall num: write syscall
-        #        syscall
-        #        #=====end func=====
-        #        j .END_SWITCH_SEEK
-        #    .END_SWITCH_SEEK
-        #    #}
-        #.SEEK_IS_PERCENT:
-        ##}
+            # switch (*seek) {
+                mov al, BYTE PTR [rdx]
+                cmp al, 'd'
+                je .SEEK_IS_d
+            .SEEK_IS_d:
+                # itostr(rdx);
+                mov rdi, rdx
+                push rbp
+                mov rbp, rsp
+                and rsp, -16
+                call itostr
+                mov rsp, rbp
+                pop rbp
+                push rax
+                #=====end func=====
+
+                # len(itostr(rdx))
+                push 3
+
+                # write(1, num, len(num));
+                pop rdx # 3rd: len(num)
+                pop rsi # 2nd: itostr(rdx) 
+                mov rdi, 1  # stdout
+                mov rax, 1  # syscall num: write syscall
+                syscall
+                #=====end func=====
+                jmp .END_SWITCH_SEEK
+            .END_SWITCH_SEEK:
+            #}
+        .SEEK_IS_PERCENT:
+        #}
         add rdx, 1 # seek++;
         jmp .BEGIN_SEEK_NULL
     .END_SEEK_NULL:    
