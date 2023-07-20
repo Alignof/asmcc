@@ -54,3 +54,53 @@ strtol:
     mov rsp, rbp
     pop rbp
     ret
+
+# edi(1st) -> int num
+# rax(ret) -> char *str
+itostr:
+    # prologue
+    push rbp
+    mov rbp, rsp
+
+    # push num
+    push edi
+
+    # counter(ecx) = 0
+    mov ecx, 0
+
+    # while (num < 0) {
+    .BEGIN_DIGIT:
+        cmp edi, 0
+        jl .END_DIGIT
+        add ecx, 1
+        jmp .BEGIN_DIGIT
+    .END_DIGIT:    
+    #}
+
+    # malloc(size)
+    add rbx, rax
+
+    # pop num
+    pop edi
+
+    # while (rax != rbx) {
+    .BEGIN_WRITE_DIGIT:
+        cmp rax, rbx
+        jl .END_WRITE_DIGIT
+        # cl = num(edi) % 10
+        cqo
+        # edi /= 10
+        idiv edi, 10
+        # ecx = edi % 10
+        mov ecx, edx
+
+        mov BYTE PTR[rbx], cl
+        sub rbx, 1
+        jmp .BEGIN_WRITE_DIGIT
+    .END_WRITE_DIGIT:    
+    #}
+
+    # epilogue
+    mov rsp, rbp
+    pop rbp
+    ret
