@@ -3,7 +3,6 @@
 .text
 .globl printf
 
-# rax -> number of args
 # rdi(1st) -> format string
 # rsi(2nd) -> arg1
 # rdx(3rd) -> arg2
@@ -12,6 +11,14 @@ printf:
     # prologue
     push rbp
     mov rbp, rsp
+    sub rsp, 0x30
+
+    mov QWORD PTR [rbp - 0x8], rsi
+    mov QWORD PTR [rbp - 0x10], rdi
+    mov QWORD PTR [rbp - 0x18], rdx
+    mov QWORD PTR [rbp - 0x20], rcx
+    mov QWORD PTR [rbp - 0x28], r8
+    mov QWORD PTR [rbp - 0x30], r9
 
     # seek null charactor and count length
     mov rdx, rdi # seek(rdx) = rdi(1st arg)
