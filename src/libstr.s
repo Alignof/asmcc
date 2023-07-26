@@ -4,6 +4,7 @@
         LEN_STRTOL_ERRMSG = (. - .STRING_STRTOL_ERRMSG)
 .text
 .globl strtol
+.globl itostr
 
 # rdi(1st) -> const char *restrict nptr
 # rsi(2nd) -> char **restrict endptr
@@ -63,7 +64,7 @@ itostr:
     mov rbp, rsp
 
     # push num
-    push edi
+    push rdi
 
     # counter(ecx) = 0
     mov ecx, 0
@@ -73,26 +74,49 @@ itostr:
         cmp edi, 0
         jl .END_DIGIT
         add ecx, 1
+        mov rax, rdi
+        mov rbx, 10
+        idiv rax, rbx
+        mov edi, eax
         jmp .BEGIN_DIGIT
     .END_DIGIT:    
     #}
 
+    # num++ (for null char)
+    add ecx, 1
+
     # malloc(size)
+    mov edi, ecx # 1st: size(ecx)
+    push rbp
+    mov rbp, rsp
+    and rsp, -16
+
+    call my_malloc
+
+    mov rsp, rbp
+    pop rbp
+    push rax
     add rbx, rax
+    #=====end func=====
 
     # pop num
-    pop edi
+    pop rdi
+    movsxd rdi, edi
+
+    # assign null char to end
+    mov BYTE PTR[rbx], 0
 
     # while (rax != rbx) {
     .BEGIN_WRITE_DIGIT:
         cmp rax, rbx
         jl .END_WRITE_DIGIT
-        # cl = num(edi) % 10
-        cqo
-        # edi /= 10
-        idiv edi, 10
+        # edi = edi / 10
         # ecx = edi % 10
-        mov ecx, edx
+        cqo
+        mov rcx, 10
+        mov rax, rdi
+        idiv rax, rcx
+        mov rdi, rax
 
         mov BYTE PTR[rbx], cl
         sub rbx, 1
